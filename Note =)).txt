@@ -1,0 +1,50 @@
+Local Search
+
+- Hàng xóm của TT1: Set của các lời giải đc sinh ra khi thực hiện phép biến đổi của trạng thái 1
+
+phép biến đổi: 1. 2-opt, 2. relocate, 3. exchange, 4. crossover
+
+Trong code mình: 2. relocate
+
+- Ví dụ:
+Trạng thái 1:
+
+Xe 1: 1,5,4,3 -> cost xe 1 = 37
+
+Xe 2: 2,7,6 -> cost xe 2 = 19
+
+-> Move: Chọn bừa 1 hành khách (5), bỏ đi -> xe 1: 1,4,3 -> cost xe 1: 34
+                -> Chèn hành khách (5) vào các xe khác sao cho cost nhỏ nhất  (max(cost 2 xe tt2) < max(cost 2 xe tt1))
+                -> giả sử chèn đc xe 2: 2,7,5,6 -> cost xe 2: 25
+                -> Chia đều hơn giữa 2 xe
+
+Trạng thái 2:
+
+Xe 1: 1,4,3 
+
+Xe 2: 2,7,5,6           
+
+Tabu Search:
+                                On
+                                --
+         O1                   --
+        --   O2           --
+    --      --      --
+---             ----
+
+Tabu List: lưu các move để ko đi lại về trạng thái cũ
+
+Chốt thuật:
+
+CP, LP: Nhân            2
+
+Greedy, CW Saving: Tuấn Trần        2
+
+SA: Nhật Minh       1
+
+Tabu: Hùng          1
+
+Local Search, GA, ACO, PSO: Hưng Trần       4
+
+### Guided Local Search: Đang nấu =))
+
