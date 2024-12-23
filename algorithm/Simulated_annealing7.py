@@ -29,10 +29,13 @@ class Truck:
 class Solver:
 
     def __init__(self, file = ""):
-        self.read(file)
-        self.reset()
+        if file != "":
+            self.read(file)
+            self.reset()
+        else:
+            print("Print run takeInput(N,K,distance_matrix) and self.reset() method")
         self.prev_truck = -1
-    
+
     def reset(self):
         self.trucks = [Truck(i) for i in range(self.K)]
 
@@ -40,6 +43,11 @@ class Solver:
 
         self.origin_reqs = [i for i in range(1, self.N+1)]
         self.attemp = 0
+
+    def takeInput(self, N, K, distance_matrix):
+        self.N = N
+        self.K = K
+        self.distance_matrix = distance_matrix
 
     def read(self, file):
         if file == "":
@@ -62,17 +70,17 @@ class Solver:
             route_idx = combination['idx']
             req = combination['req']
             cost = combination['cost']
-            
+
             # Insert the request into the truck's route at the specified index
             self.trucks[truck_idx].route.insert(route_idx, req)
             # Remove the request from the list of pending requests
             self.reqs.remove(req)
-            
+
             # Update combinations involving the inserted request or truck
             for i in range(self.K):
                 if self.combinations[i]['req'] == req or self.combinations[i]['truck_idx'] == truck_idx:
                     self.combinations[i] = None
-            
+
             # Update the cost of the truck after insertion
             self.trucks[truck_idx].cost = cost
         # print('Completed greedy construction.')
@@ -230,7 +238,7 @@ class Solver:
             for _ in range(10):
                 self.reset()  # Reset solver state
                 n = min(10, self.N)  # Choose batch size, max 10
-        
+
                 # Split requests into batches
                 for _ in range(n):
                     # Randomly sample subset of requests
@@ -240,7 +248,7 @@ class Solver:
                     for j in self.reqs:
                         self.origin_reqs.remove(j)
                     self.greedy()  # Apply greedy algorithm to current batch
-                
+
             # Process remaining requests
             self.reqs = self.origin_reqs
             self.greedy()
@@ -259,22 +267,22 @@ class Solver:
 
         else:
             n = 10  # Fixed number of batches
-            
+
             # Split requests into batches
             for _ in range(n):
                 self.reqs = random.sample(self.origin_reqs, self.N//n)
                 for j in self.reqs:
                     self.origin_reqs.remove(j)
                 self.greedy()
-            
+
             # Process remaining requests
             self.reqs = self.origin_reqs
             self.greedy()
-            
+
             # Apply simulated annealing until time limit reached
             while time.time() - start_time < time_limit:
                 self.simulated_annealing()
-            
+
             # Save best routes found
             self.best_routes = [x.route for x in self.trucks]
 
@@ -290,6 +298,31 @@ class Solver:
             with open(file, 'w') as f:
                 f.write(ans)
 
+    def getResult(self):
+        plans = []
+        max_route_distance = 0
+
+        for truck in self.best_trucks:
+            route = truck.route
+            plans.append([len(route), route])
+            if len(route) >= 2:
+                tmp_distance = 0
+                for i in range(len(route)-1):
+                    tmp_distance += self.distance_matrix[route[i]][route[i+1]]
+
+                max_route_distance = max(max_route_distance, tmp_distance)
+
+        return plans, max_route_distance
+
+def solveSA(N, K, distance_matrix):
+    solver = Solver("")
+    solver.takeInput(N, K, distance_matrix)
+    solver.reset()
+    solver.solve()
+
+    plans, max_route_distance = solver.getResult()
+
+    return plans, max_route_distance
 
 def main():
     inp_file = ""  # Để trống để sử dụng dữ liệu mẫu
