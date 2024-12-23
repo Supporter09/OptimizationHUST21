@@ -53,8 +53,8 @@ def main():
     test_sizes = {
         "small": (10, 3),
         "large": (100, 10),
-        "very-large": (200, 10),
-        "enormous": (300, 20),
+        # "very-large": (200, 10),
+        # "enormous": (300, 20),
     }
     num_cases = 10
 

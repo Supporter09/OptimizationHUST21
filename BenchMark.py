@@ -9,7 +9,7 @@ from algorithm.Local_search5 import solveLS
 from algorithm.Particle_swarm_optimization6 import solvePSO
 from algorithm.Simulated_annealing7 import solveSA
 from algorithm.Tabu_search8 import solveTabu
-from algorithm.Clarke_wright_savings9 import solveCWS
+from algorithm.Clarke_wright_savings9 import solve_vrp_clarke_wright
 from algorithm.Ant_colony_optimization10 import solveAntColony
 
 def read_test_case(file_path):
@@ -118,7 +118,7 @@ def main():
         # "PSO": solvePSO,
         # "Simulated Annealing": solveSA,
         # "TabuSearch": solveTabu,
-        # "CWS": solveCWS,
+        "CWS": solve_vrp_clarke_wright,
         # "AntColony": solveAntColony,
     }
 

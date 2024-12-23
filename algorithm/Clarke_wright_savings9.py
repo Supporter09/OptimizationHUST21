@@ -22,6 +22,35 @@ def read_input():
 		distance_matrix.append(list(map(int, input().split())))
 	return N, K, distance_matrix
 
+def calculate_route_cost(route: List[int], distance_matrix: List[List[float]]) -> float:
+    """
+    Calculate total cost of a route.
+    
+    Args:
+        route (List[int]): List of customer indices in route order
+        distance_matrix (List[List[float]]): Distance matrix
+        
+    Returns:
+        float: Total route cost
+    """
+    cost = 0
+    for i in range(len(route) - 1):
+        cost += distance_matrix[route[i]][route[i + 1]]
+    return cost
+
+def calculate_max_route_cost(routes: List[List[int]], distance_matrix: List[List[float]]) -> float:
+    """
+    Calculate maximum cost among all routes.
+    
+    Args:
+        routes (List[List[int]]): List of routes
+        distance_matrix (List[List[float]]): Distance matrix
+        
+    Returns:
+        float: Maximum route cost
+    """
+    return max(calculate_route_cost(route, distance_matrix) for route in routes)
+
 def compute_savings(N: int, distance_matrix: List[List[float]]) -> List[Tuple[float, int, int]]:
     """
     Computes the savings for all pairs of customers.
@@ -152,7 +181,9 @@ def solve_vrp_clarke_wright(N: int, K: int, distance_matrix: List[List[float]]) 
     while len(routes) < K:
         routes.append([0, 0])
 
-    return routes
+    max_cost = calculate_max_route_cost(routes, distance_matrix)
+
+    return routes, max_cost
 
 
 def solveCWS(N, K, distance_matrix):
@@ -211,7 +242,7 @@ def main():
         exit(1)
 
     # Giải quyết VRP
-    routes = solve_vrp_clarke_wright(N, K, distance_matrix)
+    routes, max_cost = solve_vrp_clarke_wright(N, K, distance_matrix)
 
     # Kiểm tra xem tất cả khách hàng đã được phục vụ chưa
     served_customers = set()
