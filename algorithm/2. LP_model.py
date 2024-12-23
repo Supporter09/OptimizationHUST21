@@ -1,5 +1,20 @@
 from ortools.linear_solver import pywraplp
 
+'''# Số lượng điểm và xe
+N = 6
+K = 2
+
+# Ma trận khoảng cách
+distance_matrix = [
+    [0, 9, 9, 9, 7, 2, 9],
+    [9, 0, 3, 0, 2, 8, 1],
+    [9, 3, 0, 3, 4, 7, 4],
+    [9, 0, 3, 0, 2, 8, 1],
+    [7, 2, 4, 2, 0, 6, 2],
+    [2, 8, 7, 8, 6, 0, 8],
+    [9, 1, 4, 1, 2, 8, 0]
+]'''
+
 # Đọc giá trị N và K
 N, K = map(int, input().split())
 
@@ -61,48 +76,27 @@ for k in range(K):
             if i != j:
                 solver.Add(u[i, k] - u[j, k] + (N * x[i, j, k]) <= N - 1)
 
-# Hàm tính tổng cost
-def calculate_cost():
-    total_cost = 0
-    for k in range(K):
-        current_location = 0  # Bắt đầu từ kho
-        while True:
-            next_location = None
-            for j in range(N + 1):
-                if current_location != j and x[current_location, j, k].solution_value() > 0.5:
-                    total_cost += distance_matrix[current_location][j]  # Cộng chi phí vào tổng
-                    next_location = j
-                    break
-            if next_location is None or next_location == 0:
-                break
-            current_location = next_location
-    return total_cost
-
 # Giải bài toán
 status = solver.Solve()
 
 # In kết quả
 if status == pywraplp.Solver.OPTIMAL:
-    # Tính tổng chi phí (cost)
-    total_cost = calculate_cost()
-    print(f'Total cost: {total_cost}')  # In tổng chi phí
-
-    #    # Uncomment the follow code to print out route
-    # print(K)  # Line 1: Số lượng xe
-    # for k in range(K):
-    #     route = []
-    #     current_location = 0  # Bắt đầu từ kho
-    #     while True:
-    #         next_location = None
-    #         for j in range(N + 1):
-    #             if current_location != j and x[current_location, j, k].solution_value() > 0.5:
-    #                 route.append(j)
-    #                 next_location = j
-    #                 break
-    #         if next_location is None or next_location == 0:
-    #             break
-    #         current_location = next_location
-    #     print(len(route))  # Line 2 * k: Số điểm xe đi qua
-    #     print('0 ' + ' '.join(map(str, route[:-1])))  # Line 2 * k + 1: Các điểm mà xe đi qua
+    #print('Optimal Z (maximum distance any vehicle travels):', z.solution_value())
+    print(K)  # Line 1: Số lượng xe
+    for k in range(K):
+        route = []
+        current_location = 0  # Bắt đầu từ kho
+        while True:
+            next_location = None
+            for j in range(N + 1):
+                if current_location != j and x[current_location, j, k].solution_value() > 0.5:
+                    route.append(j)
+                    next_location = j
+                    break
+            if next_location is None or next_location == 0:
+                break
+            current_location = next_location
+        print(len(route))  # Line 2 * k: Số điểm xe đi qua
+        print('0 ' + ' '.join(map(str, route[:-1])))  # Line 2 * k + 1: Các điểm mà xe đi qua
 else:
     print('The problem does not have an optimal solution.')
