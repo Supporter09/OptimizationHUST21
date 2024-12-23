@@ -73,7 +73,7 @@ def solveLP(N, K, distance_matrix):
 
     # In kết quả
     if status == pywraplp.Solver.OPTIMAL:
-        max_route_distance = z.solution_value()
+        max_route_distance = round(z.solution_value()) # Nhìn đây
 
         #    # Uncomment the follow code to print out route
         # print(K)  # Line 1: Số lượng xe
