@@ -8,14 +8,14 @@ class Customer:
 
     def __hash__(self):
         return hash(self.id)
-    
+
     def __eq__(self, other):
         return isinstance(other, Customer) and self.id == other.id
 
 def read_input():
 	# Đọc giá trị N và K
 	N, K = map(int, input().split())
-	
+
 	# Đọc ma trận khoảng cách
 	distance_matrix = []
 	for _ in range(N + 1):
@@ -72,33 +72,33 @@ def solve_vrp_clarke_wright(N: int, K: int, distance_matrix: List[List[float]]) 
     """
     # Tạo danh sách khách hàng (node 1 đến N)
     customers = [Customer(i, is_depot=(i == 0)) for i in range(N + 1)]
-    
+
     # Khởi tạo các tuyến đường ban đầu: mỗi khách hàng một tuyến đường [Depot, customer, Depot]
     routes = [[0, i, 0] for i in range(1, N + 1)]
-    
+
     # Tính toán savings và sắp xếp chúng
     savings = compute_savings(N, distance_matrix)
-    
+
     # Tính số khách hàng tối đa mỗi xe có thể phục vụ
     max_customers_per_vehicle = math.ceil(N / K)
-    
+
     # Iteratively merge routes based on savings
     for s, i, j in savings:
         # Tìm tuyến đường chứa khách hàng i và j
         route_i = find_route(routes, i)
         route_j = find_route(routes, j)
-        
+
         # Không thể kết hợp nếu i và j thuộc cùng một tuyến đường hoặc một trong hai không có
         if route_i == -1 or route_j == -1 or route_i == route_j:
             continue
-        
+
         # Kiểm tra xem i có ở cuối tuyến đường route_i không và j có ở đầu tuyến đường route_j không
         if routes[route_i][-2] == i and routes[route_j][1] == j:
             # Kiểm tra số lượng khách hàng sau khi kết hợp
             combined_customers = len(routes[route_i]) - 2 + len(routes[route_j]) - 2  # loại bỏ depot
             if combined_customers > max_customers_per_vehicle:
                 continue  # Không kết hợp nếu vượt quá giới hạn
-            
+
             # Kết hợp hai tuyến đường
             new_route = routes[route_i][:-1] + routes[route_j][1:]
             routes.append(new_route)
@@ -110,14 +110,14 @@ def solve_vrp_clarke_wright(N: int, K: int, distance_matrix: List[List[float]]) 
             combined_customers = len(routes[route_j]) - 2 + len(routes[route_i]) - 2  # loại bỏ depot
             if combined_customers > max_customers_per_vehicle:
                 continue  # Không kết hợp nếu vượt quá giới hạn
-            
+
             # Kết hợp hai tuyến đường
             new_route = routes[route_j][:-1] + routes[route_i][1:]
             routes.append(new_route)
             # Xóa các tuyến đường đã kết hợp (xóa từ lớn đến nhỏ để tránh sai chỉ số)
             for index in sorted([route_i, route_j], reverse=True):
                 routes.pop(index)
-    
+
     # Sau khi kết hợp dựa trên savings, kiểm tra số tuyến đường
     # Nếu số tuyến đường vẫn nhiều hơn K, cần tiếp tục kết hợp
     while len(routes) > K:
@@ -144,31 +144,29 @@ def solve_vrp_clarke_wright(N: int, K: int, distance_matrix: List[List[float]]) 
         # Xóa các tuyến đường đã kết hợp
         for index in sorted([idx1, idx2], reverse=True):
             routes.pop(index)
-    
+
     # Nếu số tuyến đường sau khi kết hợp vẫn nhiều hơn K, chúng ta sẽ phải chấp nhận vượt quá số khách hàng tối đa
     # Đây là tình huống khó xử lý trong heuristic; bạn có thể cần xem xét điều chỉnh hoặc sử dụng thuật toán khác
-    
+
     # Nếu số tuyến đường sau khi kết hợp nhỏ hơn K, thêm các tuyến đường chỉ quay lại depot
     while len(routes) < K:
         routes.append([0, 0])
-    
+
     return routes
 
-def main():
+
+def solveCWS(N, K, distance_matrix):
     """
     Main function to execute the VRP solver using Clarke-Wright Savings Algorithm with balanced distribution.
     """
-    # Đọc dữ liệu đầu vào
-    N, K, distance_matrix = read_input()
-    
     # Kiểm tra điều kiện khả thi
     if K > N:
         print("Số xe K không thể lớn hơn số khách hàng N.")
         exit(1)
-    
+
     # Giải quyết VRP
     routes = solve_vrp_clarke_wright(N, K, distance_matrix)
-    
+
     # Kiểm tra xem tất cả khách hàng đã được phục vụ chưa
     served_customers = set()
     for route in routes:
@@ -176,7 +174,53 @@ def main():
     if len(served_customers) != N:
         print("Không thể phục vụ tất cả khách hàng với số xe đã cho.")
         exit(1)
-    
+
+    # In kết quả
+    plans = []
+    max_route_distance = 0
+
+    for route in routes:
+        # Đếm số khách hàng trong tuyến đường (không bao gồm depot cuối)
+        customer_count = len(route) - 2 if len(route) > 2 else 0
+        if customer_count > 0:
+            # In các nút trong tuyến đường (không bao gồm depot cuối)
+            plans.append([customer_count, route[:-1]])
+        else:
+            # Nếu không có khách hàng nào, chỉ in depot
+            plans.append([customer_count, route[0]])
+
+        if len(route) >= 2:
+            tmp_distance = 0
+            for i in range(len(route)-1):
+                tmp_distance += distance_matrix[route[i]][route[i+1]]
+
+            max_route_distance = max(max_route_distance, tmp_distance)
+
+    return plans, max_route_distance
+
+def main():
+    """
+    Main function to execute the VRP solver using Clarke-Wright Savings Algorithm with balanced distribution.
+    """
+    # Đọc dữ liệu đầu vào
+    N, K, distance_matrix = read_input()
+
+    # Kiểm tra điều kiện khả thi
+    if K > N:
+        print("Số xe K không thể lớn hơn số khách hàng N.")
+        exit(1)
+
+    # Giải quyết VRP
+    routes = solve_vrp_clarke_wright(N, K, distance_matrix)
+
+    # Kiểm tra xem tất cả khách hàng đã được phục vụ chưa
+    served_customers = set()
+    for route in routes:
+        served_customers.update(route[1:-1])  # Loại bỏ depot đầu và cuối
+    if len(served_customers) != N:
+        print("Không thể phục vụ tất cả khách hàng với số xe đã cho.")
+        exit(1)
+
     # In kết quả
     print(K)
     for route in routes:

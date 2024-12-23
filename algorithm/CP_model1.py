@@ -31,14 +31,14 @@ from ortools.constraint_solver import pywrapcp
 #     data["num_package"] = 6
 #     return data
 
-def read_input():
+def read_input(N, K, distance_matrix):
     # Đọc giá trị N và K
-    N, K = map(int, input().split())
-    
-    # Đọc ma trận khoảng cách
-    distance_matrix = []
-    for _ in range(N + 1):
-        distance_matrix.append(list(map(int, input().split())))
+    # N, K = map(int, input().split())
+
+    # # Đọc ma trận khoảng cách
+    # distance_matrix = []
+    # for _ in range(N + 1):
+    #     distance_matrix.append(list(map(int, input().split())))
     '''N = 6
     K = 2
     distance_matrix = [
@@ -50,7 +50,7 @@ def read_input():
         [2, 8, 7, 8, 6, 0, 8],
         [9, 1, 4, 1, 2, 8, 0]
     ]'''
-    
+
     '''# Chuyển khoảng cách từ vị trí bất kì trở lại điểm ban đầu (0) thành 0:
     for i in range(len(distance_matrix)):
         distance_matrix[i][0] = 0'''
@@ -89,13 +89,38 @@ def print_solution(data, manager, routing, solution):
         max_route_distance = max(route_distance, max_route_distance)
     print(f"Maximum of the route distances: {max_route_distance}m")
 
+def getResult(data, manager, routing, solution):
+    """Return results"""
+    obj = solution.ObjectiveValue()
+    numVehicles = data["num_vehicles"] # K
 
+    plans = []
+    max_route_distance = 0
 
-def main():
+    for vehicle_id in range(data["num_vehicles"]):
+        index = routing.Start(vehicle_id)
+        track = 0
+        plan_output = ""
+        route_distance = 0
+        while not routing.IsEnd(index):
+            plan_output += f"{manager.IndexToNode(index)} "
+            track += 1
+            previous_index = index
+            index = solution.Value(routing.NextVar(index))
+            route_distance += routing.GetArcCostForVehicle(
+                previous_index, index, vehicle_id
+            )
+        plans.append([track, plan_output])
+        max_route_distance = max(route_distance, max_route_distance)
+
+    return plans, max_route_distance
+
+def solveCP(N, K, distance_matrix):
     """Entry point of the program."""
     # Instantiate the data problem.
+    print("Running CP ...")
     # data = create_data_model()
-    data = read_input()
+    data = read_input(N, K, distance_matrix)
 
     # Create the routing index manager.
     manager = pywrapcp.RoutingIndexManager(
@@ -141,11 +166,12 @@ def main():
 
     # Print solution on console.
     if solution:
-        print_solution(data, manager, routing, solution)
-        # print(data)
+        # print_solution(data, manager, routing, solution)
+        plans, max_route_distance = getResult(data, manager, routing, solution)
+        return plans, max_route_distance
     else:
-        print("No solution found !")
-
+        return -1, -1, -1, -1
 
 if __name__ == "__main__":
-    main()
+    print("Solve sth")
+    # solveCP()

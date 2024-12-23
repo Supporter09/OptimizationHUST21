@@ -50,10 +50,13 @@ class Solver:
     """
 
     def __init__(self, file = ""):
-        self.read(file)
-        self.reset()
+        if(file != ""):
+            self.read(file)
+            self.reset()
+        else:
+            print("Print run takeInput(N,K,distance_matrix) and self.reset() method")
         self.prev_truck = -1
-    
+
     def reset(self):
         self.trucks = [Truck(i) for i in range(self.K)]
 
@@ -61,6 +64,11 @@ class Solver:
 
         self.origin_reqs = [i for i in range(1, self.N+1)]
         self.attemp = 0
+
+    def takeInput(self, N, K, distance_matrix):
+        self.N = N
+        self.K = K
+        self.distance_matrix = distance_matrix
 
     def read(self, file):
         if file == "":
@@ -81,7 +89,7 @@ class Solver:
         The algorithm works as follows:
             1. While there are unassigned requests:
                 - Finds best possible insertion combination for remaining requests
-                - Inserts selected request into chosen truck's route at optimal position 
+                - Inserts selected request into chosen truck's route at optimal position
                 - Removes assigned request from pool of unassigned requests
                 - Updates combinations by removing entries for assigned request and modified truck
                 - Updates cost for affected truck
@@ -114,37 +122,37 @@ class Solver:
 
             self.trucks[truck_idx].route.insert(route_idx, req)
             self.reqs.remove(req)
-            
+
             for i in range(self.K):
                 if self.combinations[i]['req'] == req or self.combinations[i]['truck_idx'] == truck_idx:
                     self.combinations[i] = None
 
             self.trucks[truck_idx].cost = cost
-        
+
 
     def best_insert_combination(self):
         # Iterate through K trucks
         for i in range(self.K):
-            
+
             # Check if there's no combination assigned for this truck
             if self.combinations[i] == None:
                 min_cost = float('inf')  # Initialize minimum cost as infinity
                 results = []  # List to store combinations with minimum cost
-                
+
                 # Try inserting at each possible position in the route
                 for j in range(1, len(self.trucks[i].route)+1):
                     # Find request with minimum insertion cost at position j
                     req = min(self.reqs, key=lambda x: self.insert_cost(i, j, x))
                     # Calculate the cost for this request
                     current_cost = self.insert_cost(i, j, req)
-                    
+
                     # If we found another combination with same minimum cost
                     if current_cost == min_cost:
                         results.append({
                             'req': req,
                             'idx': j,
                         })
-                    
+
                     # If we found a new minimum cost
                     if current_cost < min_cost:
                         min_cost = current_cost
@@ -153,17 +161,17 @@ class Solver:
                             'req': req,
                             'idx': j,
                         })
-                
+
                 # Randomly select one combination from those with minimum cost
                 result = random.choice(results)
-                
+
                 # Extract values from chosen result
                 route_idx = result['idx']
                 req = result['req']
-                
+
                 # Calculate final insertion cost
                 min_cost = self.insert_cost(i, route_idx, req)
-                
+
                 # Create combination dictionary
                 combination = {
                     'req': req,
@@ -173,7 +181,7 @@ class Solver:
                 }
                 # Store combination for this truck
                 self.combinations[i] = combination
-        
+
         # Return combination with overall minimum cost across all trucks
         return min(self.combinations, key=lambda x: x['cost'])
 
@@ -183,7 +191,7 @@ class Solver:
 
         if (len(self.trucks[truck_idx].route) < route_idx): # just in case
             raise ValueError("route_idx cannot be greater than the length of the route")
-        
+
 
         prev = self.trucks[truck_idx].route[route_idx-1]
 
@@ -206,7 +214,7 @@ class Solver:
         # Reset combinations array if we're looking at a different truck than last time
         if self.prev_truck != random_truck_idx:
             self.combinations = [None for _ in range(self.K)]
-        
+
         # Update the previous truck index
         self.prev_truck = random_truck_idx
 
@@ -226,12 +234,12 @@ class Solver:
             # If removing the node doesn't improve cost, remove it from reqs
             if self.route_cost(temp) >= self.route_cost(current_truck.route):
                 self.reqs.remove(current_truck.route[node_idx])
-            
+
             # If no nodes left to consider, increment attempt counter and exit
             if not self.reqs:
                 self.attemp += 1
                 return
-        
+
         # Find best possible insertion combination for remaining nodes
         combination = self.best_insert_combination()
         req = combination['req']           # Node to insert
@@ -249,7 +257,7 @@ class Solver:
             for i in range(self.K):
                 if self.combinations[i]['req'] == req or self.combinations[i]['truck_idx'] == truck_idx:
                     self.combinations[i] = None
-            
+
             # Perform the move: insert node into new truck and remove from old truck
             self.trucks[truck_idx].route.insert(route_idx, req)
             self.trucks[random_truck_idx].route.remove(req)
@@ -285,7 +293,7 @@ class Solver:
         The solve process involves:
         1. Breaking down the problem into smaller sub-problems
         2. Solving each sub-problem using greedy algorithm
-        3. Applying local search to improve the solution 
+        3. Applying local search to improve the solution
         Returns:
             list: Best routes found for all trucks, where each route is a sequence of customer nodes
         Algorithm Steps:
@@ -311,13 +319,13 @@ class Solver:
         if self.N <= 200:
             max_attemp = 5  # Maximum attempts for local search
             max_cost = float('inf')  # Track best solution cost
-            
+
             # Try 20 different initial solutions
             for _ in range(20):
                 self.reset()  # Reset all trucks and requests
-                
+
                 n = min(10, self.N)  # Number of chunks to split requests into
-                
+
                 # Split requests into chunks and solve each chunk greedily
                 for _ in range(n):
                     # Randomly sample subset of requests
@@ -326,7 +334,7 @@ class Solver:
                     for j in self.reqs:
                         self.origin_reqs.remove(j)
                     self.greedy()  # Apply greedy algorithm to current chunk
-                
+
                 # Handle remaining requests
                 self.reqs = self.origin_reqs
                 self.greedy()
@@ -346,26 +354,26 @@ class Solver:
         # Branch for larger problem sizes (N > 200)
         else:
             n = 10  # Fixed number of chunks
-            
+
             # Split and solve chunks greedily
             for _ in range(n):
                 self.reqs = random.sample(self.origin_reqs, self.N//n)
                 for j in self.reqs:
                     self.origin_reqs.remove(j)
                 self.greedy()
-            
+
             # Handle remaining requests
             self.reqs = self.origin_reqs
             self.greedy()
-            
+
             # Apply local search until time limit reached
             while time.time() - start_time < time_limit:
                 self.local_search()
-            
+
             # Save final solution
             self.best_routes = [x.route for x in self.trucks]
-            
-            
+
+
     def write(self, file = ""):
         ans = str(self.K) + "\n"
         for route in self.best_routes:
@@ -378,6 +386,21 @@ class Solver:
             with open(file, 'w') as f:
                 f.write(ans)
 
+    def getResult(self):
+        plans = []
+
+        max_route_distance = 0
+        for route in self.best_routes:
+            plans.append([len(route), route])
+            if len(route) >= 2:
+                tmp_distance = 0
+                for i in range(len(route)-1):
+                    tmp_distance += self.distance_matrix[route[i]][route[i+1]]
+
+                max_route_distance = max(max_route_distance, tmp_distance)
+
+        return plans, max_route_distance
+
 def main():
     inp_file = ""
     out_file = ""
@@ -388,6 +411,14 @@ def main():
 
     solver.write(out_file)
 
+def solveLS(N, K, distance_matrix):
+    print("Running LocalSearch ...")
+    solver = Solver("")
+    solver.takeInput(N, K, distance_matrix)
+    solver.reset()
+    solver.solve()
+    plans, max_route_distance = solver.getResult()
+    return plans, max_route_distance
 
 if __name__ == "__main__":
     main()

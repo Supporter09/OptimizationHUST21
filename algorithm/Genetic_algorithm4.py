@@ -16,7 +16,7 @@ decode chromosome:
 class Individual:
 	def __init__(self, N, K, distance_matrix, chromosome = None):
 
-		self.N = N 
+		self.N = N
 		self.K = K
 		#len of chromosome
 		self.n = N + K - 1
@@ -26,7 +26,7 @@ class Individual:
 			self.chromosome = [-i for i in range(K-1)]
 			self.chromosome += [i+1 for i in range(N)]
 			random.shuffle(self.chromosome)
-			
+
 		else:
 			self.chromosome = chromosome
 
@@ -38,7 +38,7 @@ class Individual:
 
 		self.prob = 0
 
-	
+
 	# calc fitness base on Route
 	def calc_fitness(self):
 
@@ -51,7 +51,7 @@ class Individual:
 
 		for gene in self.chromosome:
 			#if gene <= 0, go to next truck
-			if gene <= 0:			
+			if gene <= 0:
 				index += 1
 				#truck allways start at index 0
 				self.Routes[index].append(0)
@@ -64,12 +64,12 @@ class Individual:
 		for i, route in enumerate(self.Routes):
 			for j in range(1, len(route)):
 				fitnesses[i] += self.distance_matrix[route[j-1]][route[j]]
-			
-		
-		
+
+
+
 		#total fitness and max fitness
 		return max(fitnesses), sum(fitnesses)
-	
+
 	#Crossover
 	def crossover(self, other):
 		choice = random.choice([1, 2, 3])
@@ -91,7 +91,7 @@ class Individual:
 
 		if a > b:
 			a, b = b, a
-		
+
 		middle_chromosome: list = dad_chromosome[a:b]
 
 		temp_chromosome: list = mom_chromosome[b:] + mom_chromosome[:b]
@@ -100,9 +100,9 @@ class Individual:
 			temp_chromosome.remove(gene)
 
 		child_chromosome = temp_chromosome[self.n-b:] + middle_chromosome + temp_chromosome[:self.n-b]
-		
+
 		return child_chromosome
-	
+
 	#Edge recombination crossover
 	def ERX(self, other):
 		mom_chromosome = self.chromosome
@@ -118,23 +118,23 @@ class Individual:
 
 			elif mom_index == self.n-1:
 				neighbors += [mom_chromosome[0], mom_chromosome[self.n-2]]
-			
+
 			else:
 				neighbors += [mom_chromosome[mom_index-1], mom_chromosome[mom_index+1]]
-			
+
 			if dad_index == 0:
 				neighbors += [dad_chromosome[-1], dad_chromosome[1]]
 
 			elif dad_index == self.n-1:
 				neighbors += [dad_chromosome[0], dad_chromosome[self.n-2]]
-			
+
 			else:
 				neighbors += [dad_chromosome[dad_index-1], dad_chromosome[dad_index+1]]
-			
+
 			return list(set(neighbors))
 
 		neighbors = {i: find_neighbor(i) for i in range(-self.K+2, self.N+1)}
-		
+
 		index = 0
 		child_chromosome = []
 		gene = mom_chromosome[0]
@@ -151,7 +151,7 @@ class Individual:
 					gene = g
 					check = True
 					break
-			
+
 			if not check:
 				for g in mom_chromosome:
 					if g not in child_chromosome:
@@ -183,7 +183,7 @@ class Individual:
 				current = dad_chromosome
 			elif current == dad_chromosome:
 				current = mom_chromosome
-			
+
 			index = current.index(gene) + 1
 
 			if index >= self.n:
@@ -191,15 +191,15 @@ class Individual:
 					if visited[i] == False:
 						index = current.index(i)
 						break
-			
+
 			elif visited[current[index]] == True:
 				for i in range(-self.K+1, self.N+1):
 					if visited[i] == False:
 						index = current.index(i)
 						break
-		
+
 		return child_chromosome
-	
+
 	#mutation
 	def mutation(self, rate):
 		if random.random() < rate:
@@ -218,7 +218,7 @@ class Individual:
 		b = random.randint(0, self.n-1)
 
 		self.chromosome[a], self.chromosome[b] = self.chromosome[b], self.chromosome[a]
-	
+
 	# take genes from a to b and scramble
 	def scramble_mutation(self):
 		a = random.randint(0, self.n-1)
@@ -228,9 +228,9 @@ class Individual:
 
 		temp = self.chromosome[a:b].copy()
 		random.shuffle(temp)
-		
+
 		self.chromosome = self.chromosome[:a] + temp + self.chromosome[b:]
-	
+
 	# take genes from a to b and inverse
 	def inversion_mutation(self):
 		a = random.randint(0, self.n-1)
@@ -240,10 +240,10 @@ class Individual:
 
 		temp = self.chromosome[a:b].copy()
 		temp.reverse()
-		
+
 		self.chromosome = self.chromosome[:a] + temp + self.chromosome[b:]
 
-#Solution class	
+#Solution class
 class GA:
 	def __init__(self, N, K, distance_matrix, n, generations, mutation_rate, greedy_chromosome):
 		#Populations contain n Individual
@@ -254,7 +254,7 @@ class GA:
 		self.mutation_rate = mutation_rate
 		self.N = N
 		self.K = K
-	
+
 	def solve(self):
 
 		self.calc_fitness()
@@ -278,7 +278,7 @@ class GA:
 
 				iteration = 0
 
-			
+
 			# early stopping
 			if iteration > max_iteration:
 				break
@@ -301,11 +301,11 @@ class GA:
 
 				#add new gen
 				new_gen.append(child)
-		
+
 			self.populations = new_gen
-		
-		
-	
+
+
+
 	#calc populations fitness
 	def calc_fitness(self):
 		#calc fitness for each individual
@@ -322,16 +322,16 @@ class GA:
 
 		for i, individual in enumerate(self.populations):
 			individual.prob = Probs[i]
-		
+
 		for i in range(1, len(Probs)):
 			Probs[i] += Probs[i-1]
-			
+
 		return Probs
 
-	
+
 	#choose 2 parents base on rank
 	def natural_selection(self, Probs):
-		
+
 		parent = []
 		Probs = [0] + Probs
 
@@ -358,13 +358,30 @@ class GA:
 				route_cost += self.distance_matrix[self.best_sol.Routes[truck][j-1]][self.best_sol.Routes[truck][j]]
 			routes_cost[truck] = route_cost
 			max_cost = max(max_cost, route_cost)
-			
+
 			# Print route details
 			print(len(self.best_sol.Routes[truck]))
 			print(*self.best_sol.Routes[truck])
-		
+
 		print('Max Cost', max_cost)
-		
+
+	def getResult(self):
+		max_cost = 0
+		routes_cost = [0 for _ in range(self.K)]
+
+		plans = []
+		# Calculate routes' individual costs
+		for truck in range(self.K):
+			route_cost = 0
+			for j in range(1, len(self.best_sol.Routes[truck])):
+				route_cost += self.distance_matrix[self.best_sol.Routes[truck][j-1]][self.best_sol.Routes[truck][j]]
+			routes_cost[truck] = route_cost
+			max_cost = max(max_cost, route_cost)
+
+			# Add plan
+			plans.append([len(self.best_sol.Routes[truck]), self.best_sol.Routes[truck]])
+
+		return plans, max_cost
 
 	#exporting solution
 	def export_sol(self, file):
@@ -376,7 +393,7 @@ class GA:
 
 				for node in self.best_sol.Routes[truck]:
 					f.write(str(node) + " ")
-				
+
 				f.write("\n")
 
 
@@ -404,26 +421,26 @@ def create_greedy_chromosome(N, K, distance_matrix):
 				route_idx = combination['idx']
 				req = combination['req']
 				cost = combination['cost']
-				
+
 				# Chèn yêu cầu vào route của truck
 				self.trucks[truck_idx].route.insert(route_idx, req)
 				# Loại bỏ yêu cầu khỏi danh sách các yêu cầu chưa phục vụ
 				self.reqs.remove(req)
-				
+
 				# Đánh dấu các truck và yêu cầu đã được xử lý
 				for i in range(self.K):
 					if self.combinations[i] is None or self.combinations[i]['req'] == req or self.combinations[i]['truck_idx'] == truck_idx:
 						self.combinations[i] = None
-				
+
 				# Cập nhật chi phí của truck
 				self.trucks[truck_idx].cost = cost
-			
+
 			# Tạo chromosome từ các route của trucks
 			for truck_idx, truck in enumerate(self.trucks):
 				if truck_idx > 0:
 					chromosome.append(-truck_idx + 1)  # Đánh dấu chuyển truck
 				chromosome.extend(truck.route[1:])  # Bỏ qua depot (node 0)
-			
+
 			return chromosome
 
 		def best_insert_combination(self):
@@ -475,10 +492,10 @@ def create_greedy_chromosome(N, K, distance_matrix):
 			# Kiểm tra tính hợp lệ của route_idx
 			if route_idx <= 0 or route_idx > len(self.trucks[truck_idx].route):
 				raise ValueError("route_idx không hợp lệ")
-			
+
 			# Lấy node trước đó trong route
 			prev = self.trucks[truck_idx].route[route_idx - 1]
-			
+
 			# Nếu chèn ở cuối route
 			if route_idx == len(self.trucks[truck_idx].route):
 				cost = self.trucks[truck_idx].cost + self.distance_matrix[prev][node]
@@ -488,26 +505,26 @@ def create_greedy_chromosome(N, K, distance_matrix):
 				# Cập nhật chi phí bằng cách loại bỏ khoảng cách cũ và thêm khoảng cách mới
 				cost = self.trucks[truck_idx].cost - self.distance_matrix[prev][current] + \
 					self.distance_matrix[prev][node] + self.distance_matrix[node][current]
-			
+
 			return cost
 
 	# Khởi tạo và chạy giải thuật greedy
 	greedy_constructor = GreedyConstructor(N, K, distance_matrix)
 	return greedy_constructor.greedy()
 
-
 def read_input():
 	# Đọc giá trị N và K
 	N, K = map(int, input().split())
-	
+
 	# Đọc ma trận khoảng cách
 	distance_matrix = []
 	for _ in range(N + 1):
 		distance_matrix.append(list(map(int, input().split())))
 	return N, K, distance_matrix
 
-def main():
-	N, K, distance_matrix = read_input()
+def solveGA(N,K,distance_matrix):
+	print("Running Genetic Algorithm ...")
+	# N, K, distance_matrix = read_input()
 	populations_num = 100
 	generations = 100
 	mutation_rate = 0.1
@@ -519,7 +536,9 @@ def main():
 
 	sol.solve()
 
-	sol.print_sol()
-	# print(greedy_chromosome)
+	plans, max_route_distance = sol.getResult()
+	return plans, max_route_distance
+
 if __name__ == "__main__":
-	main()
+	# main()
+	print("BALLL")
