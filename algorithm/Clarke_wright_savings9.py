@@ -34,7 +34,7 @@ def calculate_route_cost(route: List[int], distance_matrix: List[List[float]]) -
         float: Total route cost
     """
     cost = 0
-    for i in range(len(route) - 1):
+    for i in range(len(route) - 2):
         cost += distance_matrix[route[i]][route[i + 1]]
     return cost
 
@@ -265,6 +265,6 @@ def main():
         else:
             # Nếu không có khách hàng nào, chỉ in depot
             print(route[0])
-
+    print(f"max_cost: {max_cost}")
 if __name__ == "__main__":
     main()

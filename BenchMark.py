@@ -75,8 +75,8 @@ def benchmark_and_export(test_case_dir, solution_dir, algorithms, output_csv):
     for algorithm_name, solver_class in algorithms.items():
         # Iterate through test sizes
         # Size: ["small", "large", "very-large", "enormous"]
-        for size in ["small"]:
-            for i in range(1, 11):  # Assuming 10 test cases per size
+        for size in ["small", "large"]:
+            for i in range(1, 4):  # Assuming 10 test cases per size
                 test_case_file = os.path.join(test_case_dir, f"{size}{i}.txt")
                 solution_file = os.path.join(solution_dir, f"{size}_answer{i}.txt")
 
@@ -111,9 +111,9 @@ def main():
     # Define algorithms to benchmark
     algorithms = {
         "CP": solveCP,
-        "LP": solveLP,
-        # "Greedy": solveGreedy,
-        # "Genetic": solveGA,
+        # "LP": solveLP,
+        "Greedy": solveGreedy,
+        "Genetic": solveGA,
         # "LocalSearch": solveLS,
         # "PSO": solvePSO,
         # "Simulated Annealing": solveSA,
