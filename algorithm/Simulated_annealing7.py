@@ -29,11 +29,8 @@ class Truck:
 class Solver:
 
     def __init__(self, file = ""):
-        if file != "":
-            self.read(file)
-            self.reset()
-        else:
-            print("Print run takeInput(N,K,distance_matrix) and self.reset() method")
+        self.read(file)
+        self.reset()
         self.prev_truck = -1
 
     def reset(self):
@@ -164,6 +161,15 @@ class Solver:
                 route_cost += self.distance_matrix[truck.route[i - 1]][truck.route[i]]
             total += route_cost
         return total
+    
+    def calculate_max_cost(self):
+        maxi = float('-inf')
+        for truck in self.trucks:
+            route_cost = 0
+            for i in range(1, len(truck.route)):
+                route_cost += self.distance_matrix[truck.route[i - 1]][truck.route[i]]
+            maxi = max(maxi, route_cost)
+        return maxi
 
     def get_neighbor(self):
         # Tạo một bản sao sâu của giải pháp hiện tại
@@ -195,7 +201,7 @@ class Solver:
         return cost
 
     def simulated_annealing(self):
-        current_cost = self.calculate_total_cost()
+        current_cost = self.calculate_max_cost()
         best_cost = current_cost
         self.best_trucks = [truck.copy() for truck in self.trucks]
         self.best_cost = best_cost
@@ -208,7 +214,7 @@ class Solver:
         while T > T_min and (time.time() - start_time) < time_limit:
             # Tạo một giải pháp lân cận
             neighbor = self.get_neighbor()
-            neighbor_cost = neighbor.calculate_total_cost()
+            neighbor_cost = neighbor.calculate_max_cost()
 
             delta = neighbor_cost - current_cost
 
