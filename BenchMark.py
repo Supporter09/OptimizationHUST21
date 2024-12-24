@@ -9,7 +9,7 @@ from algorithm.Local_search5 import solveLS
 from algorithm.Particle_swarm_optimization6 import solvePSO
 from algorithm.Simulated_annealing7 import solveSA
 from algorithm.Tabu_search8 import solveTabu
-from algorithm.Clarke_wright_savings9 import solveCWS
+from algorithm.Clarke_wright_savings9 import solve_vrp_clarke_wright
 from algorithm.Ant_colony_optimization10 import solveAntColony
 
 def read_test_case(file_path):
@@ -75,7 +75,7 @@ def benchmark_and_export(test_case_dir, solution_dir, algorithms, output_csv):
     for algorithm_name, solver_class in algorithms.items():
         # Iterate through test sizes
         # Size: ["small", "large", "very-large", "enormous"]
-        for size in ["small"]:
+        for size in ["small", "large", "very-large", "enormous"]:
             for i in range(1, 11):  # Assuming 10 test cases per size
                 test_case_file = os.path.join(test_case_dir, f"{size}{i}.txt")
                 solution_file = os.path.join(solution_dir, f"{size}_answer{i}.txt")
@@ -112,14 +112,14 @@ def main():
     algorithms = {
         "CP": solveCP,
         "LP": solveLP,
-        # "Greedy": solveGreedy,
-        # "Genetic": solveGA,
-        # "LocalSearch": solveLS,
-        # "PSO": solvePSO,
-        # "Simulated Annealing": solveSA,
-        # "TabuSearch": solveTabu,
-        # "CWS": solveCWS,
-        # "AntColony": solveAntColony,
+        "Greedy": solveGreedy,
+        "Genetic": solveGA,
+        "LocalSearch": solveLS,
+        "PSO": solvePSO,
+        "Simulated Annealing": solveSA,
+        "TabuSearch": solveTabu,
+        "CWS": solve_vrp_clarke_wright,
+        "AntColony": solveAntColony,
     }
 
     # Run benchmarking and export results

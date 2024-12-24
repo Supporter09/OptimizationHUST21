@@ -10,9 +10,9 @@ def solveLP(N, K, distance_matrix):
     # for _ in range(N + 1):
     #     distance_matrix.append(list(map(int, input().split())))
 
-    # # Chuyển khoảng cách từ vị trí bất kì trở lại điểm ban đầu (0) thành 0:
-    # for i in range(len(distance_matrix)):
-    #     distance_matrix[i][0] = 0
+    # Chuyển khoảng cách từ vị trí bất kì trở lại điểm ban đầu (0) thành 0:
+    for i in range(len(distance_matrix)):
+        distance_matrix[i][0] = 0
 
     # Khởi tạo solver
     solver = pywraplp.Solver.CreateSolver('CBC')
@@ -49,12 +49,12 @@ def solveLP(N, K, distance_matrix):
     for k in range(K):
         for i in range(1, N + 1):
             solver.Add(solver.Sum(x[i, j, k] for j in range(N + 1) if i != j) ==
-                    solver.Sum(x[j, i, k] for j in range(N + 1) if i != j))
+                       solver.Sum(x[j, i, k] for j in range(N + 1) if i != j))
 
     # Ràng buộc 4: Tổng quãng đường của mỗi xe phải <= z
     for k in range(K):
         solver.Add(solver.Sum(distance_matrix[i][j] * x[i, j, k]
-                            for i in range(N + 1) for j in range(N + 1) if i != j) <= z)
+                              for i in range(N + 1) for j in range(N + 1) if i != j) <= z)
 
     # Ràng buộc 5: Loại bỏ chu trình con (Subtour Elimination)
     for k in range(K):
@@ -63,12 +63,17 @@ def solveLP(N, K, distance_matrix):
                 if i != j:
                     solver.Add(u[i, k] - u[j, k] + (N * x[i, j, k]) <= N - 1)
 
+    # Ràng buộc 6: Điểm kế tiếp điểm 0 của mỗi xe phải có thứ tự là u[i, k] == 1
+    for k in range(K):
+        for i in range(1, N + 1):
+            solver.Add(u[i, k] + (1 - x[0, i, k]) * N >= 1)
+
     # Giải bài toán
     status = solver.Solve()
 
     # In kết quả
     if status == pywraplp.Solver.OPTIMAL:
-        max_route_distance = z.solution_value()
+        max_route_distance = round(z.solution_value()) # Nhìn đây
 
         #    # Uncomment the follow code to print out route
         # print(K)  # Line 1: Số lượng xe
