@@ -412,7 +412,6 @@ def main():
     solver.write(out_file)
 
 def solveLS(N, K, distance_matrix):
-    print("Running LocalSearch ...")
     solver = Solver("")
     solver.takeInput(N, K, distance_matrix)
     solver.reset()

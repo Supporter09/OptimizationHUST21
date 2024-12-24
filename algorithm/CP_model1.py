@@ -118,7 +118,6 @@ def getResult(data, manager, routing, solution):
 def solveCP(N, K, distance_matrix):
     """Entry point of the program."""
     # Instantiate the data problem.
-    print("Running CP ...")
     # data = create_data_model()
     data = read_input(N, K, distance_matrix)
 

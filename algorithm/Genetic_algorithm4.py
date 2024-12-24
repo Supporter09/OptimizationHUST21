@@ -523,7 +523,6 @@ def read_input():
 	return N, K, distance_matrix
 
 def solveGA(N,K,distance_matrix):
-	print("Running Genetic Algorithm ...")
 	# N, K, distance_matrix = read_input()
 	populations_num = 100
 	generations = 100

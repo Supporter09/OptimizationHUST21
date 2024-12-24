@@ -10,7 +10,6 @@ class Truck:
         self.distance = 0
 
 def solveGreedy(N, K, distance_matrix):
-    print("Running Greedy ...")
     # Khởi tạo ma trận thời gian và các biến
     # distance_matrix = [[0] * MAX_N for _ in range(MAX_N)]
     # N = 0

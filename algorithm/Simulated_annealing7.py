@@ -301,9 +301,7 @@ class Solver:
     def getResult(self):
         plans = []
         max_route_distance = 0
-
-        for truck in self.best_trucks:
-            route = truck.route
+        for route in self.best_routes:
             plans.append([len(route), route])
             if len(route) >= 2:
                 tmp_distance = 0
@@ -311,7 +309,6 @@ class Solver:
                     tmp_distance += self.distance_matrix[route[i]][route[i+1]]
 
                 max_route_distance = max(max_route_distance, tmp_distance)
-
         return plans, max_route_distance
 
 def solveSA(N, K, distance_matrix):
@@ -327,7 +324,6 @@ def solveSA(N, K, distance_matrix):
 def main():
     inp_file = ""  # Để trống để sử dụng dữ liệu mẫu
     out_file = ""  # Để trống để in kết quả ra màn hình
-
     solver = Solver(inp_file)
 
     solver.solve()

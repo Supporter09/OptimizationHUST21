@@ -1,7 +1,6 @@
 from ortools.linear_solver import pywraplp
 
 def solveLP(N, K, distance_matrix):
-    print("Running LP ...")
     # Đọc giá trị N và K
     # N, K = map(int, input().split())
 
@@ -91,7 +90,12 @@ def solveLP(N, K, distance_matrix):
                 if next_location is None or next_location == 0:
                     break
                 current_location = next_location
-            plans.append([len(route), route[:-1]])
+
+            final_route = [0]
+            for node in route[:-1]:
+                final_route.append(node)
+                
+            plans.append([len(route), final_route])
             # print(len(route))  # Line 2 * k: Số điểm xe đi qua
             # print('0 ' + ' '.join(map(str, route[:-1])))  # Line 2 * k + 1: Các điểm mà xe đi qua
 
