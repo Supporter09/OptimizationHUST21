@@ -123,9 +123,9 @@ def benchmark_and_export(
         }
 
         # Size: ["small", "large", "very-large", "enormous"]
-        for size in ["small", "large", "very-large", "enormous"]:
+        for size in ["small", "large", "very-large"]:
             # Don't run LP in very large and enormous algo
-            if size in ["very-large", "enormous"] and algorithm_name == "LP":
+            if size in ["large", "very-large", "enormous"] and algorithm_name == "LP":
                 continue
 
             for i in range(1, 11):  # Assuming 10 test cases per size
@@ -251,15 +251,15 @@ def main():
     # Define algorithms to benchmark
     algorithms = {
         "CP": solveCP,
-        "LP": solveLP,
-        "Greedy": solveGreedy,
-        "Genetic": solveGA,
-        "LocalSearch": solveLS,
-        "PSO": solvePSO,
-        "Simulated Annealing": solveSA,
-        "TabuSearch": solveTabu,
-        "CWS": solve_vrp_clarke_wright,
-        "AntColony": solveAntColony,
+        # "LP": solveLP,
+        # "Greedy": solveGreedy,
+        # "Genetic": solveGA,
+        # "LocalSearch": solveLS,
+        # "PSO": solvePSO,
+        # "Simulated Annealing": solveSA,
+        # "TabuSearch": solveTabu,
+        # "CWS": solve_vrp_clarke_wright,
+        # "AntColony": solveAntColony,
     }
 
     # Run benchmarking and export results
