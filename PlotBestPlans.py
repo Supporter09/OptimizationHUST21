@@ -229,7 +229,7 @@ for algorithm, sizes in all_plans.items():
         for plan in data["plans"]:
             print(plan)
 
-        # plotRoutes(data['num_of_vehicles'], 0, data["plans"], algorithm)
+        plotRoutes(data['num_of_vehicles'], 0, data["plans"], algorithm)
 
-plot_output_dir = "comparison_plots"
-plot_comparison(all_plans, plot_output_dir)
+# plot_output_dir = "comparison_plots"
+# plot_comparison(all_plans, plot_output_dir)
