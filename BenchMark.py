@@ -11,7 +11,7 @@ from algorithm.Simulated_annealing7 import solveSA
 from algorithm.Tabu_search8 import solveTabu
 from algorithm.Clarke_wright_savings9 import solve_vrp_clarke_wright
 from algorithm.Ant_colony_optimization10 import solveAntColony
-
+import random
 
 def read_test_case(file_path):
     """
@@ -123,7 +123,7 @@ def benchmark_and_export(
         }
 
         # Size: ["small", "large", "very-large", "enormous"]
-        for size in ["small", "large", "very-large"]:
+        for size in ["small", "large", "very-large", "enormous"]:
             # Don't run LP in very large and enormous algo
             if size in ["large", "very-large", "enormous"] and algorithm_name == "LP":
                 continue
@@ -250,13 +250,13 @@ def main():
 
     # Define algorithms to benchmark
     algorithms = {
-        "CP": solveCP,
+        # "CP": solveCP,
         # "LP": solveLP,
         # "Greedy": solveGreedy,
         # "Genetic": solveGA,
         # "LocalSearch": solveLS,
         # "PSO": solvePSO,
-        # "Simulated Annealing": solveSA,
+        "Simulated Annealing": solveSA,
         # "TabuSearch": solveTabu,
         # "CWS": solve_vrp_clarke_wright,
         # "AntColony": solveAntColony,
